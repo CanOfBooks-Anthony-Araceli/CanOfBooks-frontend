@@ -42,6 +42,8 @@ JavaScript, CSS, HTML.
 11-02-2023 7:30pm - Created base web app.
 11-02-2023 7:45pm - Requested data from server.
 11-02-2023 8:00pm - Created the carousel with the data requested from server.
+15-02-2023 10:30pm - Created BookFormModel and added post functionality.
+15-02-2023 11:00pm - Added delete functionality.
 
 ## Estimates
 <!-- See below -->
