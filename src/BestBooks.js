@@ -3,6 +3,7 @@ import axios from 'axios';
 import Carousel from 'react-bootstrap/Carousel'
 import Button from 'react-bootstrap/Button';
 import BookFormModal from './BookFormModal';
+import BookUpdateModal from './BookUpdateModal';
 
 
 class BestBooks extends React.Component {
@@ -10,7 +11,9 @@ class BestBooks extends React.Component {
     super(props);
     this.state = {
       books: [],
-      showModal: false
+      showModal: false,
+      showUpdateModal: false,
+      bookToUpdate: {}
     }
   }
 
@@ -64,11 +67,32 @@ class BestBooks extends React.Component {
   }
   }
 
+  putBook = async (updatedBooks) => {
+    try{
+      console.log(updatedBooks);
+      let url = `${process.env.REACT_APP_SERVER}/books/${updatedBooks._id}`;
+      await axios.put(url, updatedBooks);
+      const updatedBooksArr = this.state.books.map(oldBook => updatedBooks._id === oldBook._id ? updatedBooks : oldBook);
+      this.setState({
+        books: updatedBooksArr
+      })
+    }
+    catch (error) {
+      console.error(error);
+    }
+  }
 
 
   showModal = () => {
     this.setState({
      showModal: true
+    });
+  };
+
+  showUpdateModal = (book) => {
+    this.setState({
+     showUpdateModal: true,
+     bookToUpdate: book
     });
   };
 
@@ -78,6 +102,11 @@ class BestBooks extends React.Component {
     });
   };
 
+  handleCloseUpdateModal = () => {
+    this.setState({
+      showUpdateModal: false
+    });
+  };
 
 
   render() {
@@ -97,6 +126,7 @@ class BestBooks extends React.Component {
               <Carousel.Caption>
                 <h3>Title: {book.title}</h3>
                 <p>Description: {book.desc}</p>
+                <Button variant='success' onClick={() => this.showUpdateModal(book)} type='button'>Update Book</Button>
                 <Button variant='danger' onClick={() => this.deleteBook(book._id)} type='button'>Delete book</Button>
               </Carousel.Caption>
              </Carousel.Item>
@@ -111,7 +141,13 @@ class BestBooks extends React.Component {
         handleShow={this.state.showModal}
         handleClose={this.handleCloseModal}
         postBook={this.postBook}
-        ></BookFormModal>
+        />
+        <BookUpdateModal
+         handleShow={this.state.showUpdateModal}
+         handleClose={this.handleCloseUpdateModal}
+         putBook={this.putBook}
+         bookToUpdate={this.state.bookToUpdate}
+         />
 
       </>
     )
