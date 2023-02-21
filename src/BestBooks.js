@@ -4,6 +4,7 @@ import Carousel from 'react-bootstrap/Carousel'
 import Button from 'react-bootstrap/Button';
 import BookFormModal from './BookFormModal';
 import BookUpdateModal from './BookUpdateModal';
+import { Container } from 'react-bootstrap';
 
 
 class BestBooks extends React.Component {
@@ -114,43 +115,59 @@ class BestBooks extends React.Component {
     /* TODO: render all the books in a Carousel */
     return (
       <>
-
         {this.state.books.length ? (
-          <Carousel fade>
-            {this.state.books.map(book => 
-              <Carousel.Item key={book._id}>
-            <img 
-            src='https://via.placeholder.com/1500x400.jpeg?text=Book+Image'
-            alt={book.title}
-            />
-              <Carousel.Caption>
-                <h3>Title: {book.title}</h3>
-                <p>Description: {book.desc}</p>
-                <Button variant='success' onClick={() => this.showUpdateModal(book)} type='button'>Update Book</Button>
-                <Button variant='danger' onClick={() => this.deleteBook(book._id)} type='button'>Delete book</Button>
-              </Carousel.Caption>
-             </Carousel.Item>
-             )}
-          </Carousel>
+          <Container className='carouselContainer'>
+            <Carousel className="bookCarousel" fade>
+              {this.state.books.map((book) => (
+                <Carousel.Item key={book._id}>
+                  <img
+                    src="https://via.placeholder.com/1500x400.jpeg?text=Book+Image"
+                    alt={book.title}
+                  />
+                  <Carousel.Caption>
+                    <h3>Title: {book.title}</h3>
+                    <p>Description: {book.desc}</p>
+                    <Button
+                      className='updateBook'
+                      variant="success"
+                      onClick={() => this.showUpdateModal(book)}
+                      type="button"
+                    >
+                      Update Book
+                    </Button>
+                    <Button
+                      className='deleteBook'
+                      variant="danger"
+                      onClick={() => this.deleteBook(book._id)}
+                      type="button"
+                    >
+                      Delete book
+                    </Button>
+                  </Carousel.Caption>
+                </Carousel.Item>
+              ))}
+            </Carousel>
+          </Container>
         ) : (
           <h3>Empty book collection</h3>
         )}
-        
-        <Button variant='primary' onClick={this.showModal} type='button'>Add Book</Button>
+
+        <Button className='addBook' variant="primary" onClick={this.showModal} type="button">
+          Add Book
+        </Button>
         <BookFormModal
-        handleShow={this.state.showModal}
-        handleClose={this.handleCloseModal}
-        postBook={this.postBook}
+          handleShow={this.state.showModal}
+          handleClose={this.handleCloseModal}
+          postBook={this.postBook}
         />
         <BookUpdateModal
-         handleShow={this.state.showUpdateModal}
-         handleClose={this.handleCloseUpdateModal}
-         putBook={this.putBook}
-         bookToUpdate={this.state.bookToUpdate}
-         />
-
+          handleShow={this.state.showUpdateModal}
+          handleClose={this.handleCloseUpdateModal}
+          putBook={this.putBook}
+          bookToUpdate={this.state.bookToUpdate}
+        />
       </>
-    )
+    );
   }
 }
 
