@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import BookFormModal from './BookFormModal';
 import BookUpdateModal from './BookUpdateModal';
 import { Container } from 'react-bootstrap';
+import { withAuth0 } from '@auth0/auth0-react';
 
 
 class BestBooks extends React.Component {
@@ -29,11 +30,19 @@ class BestBooks extends React.Component {
     let url = `${process.env.REACT_APP_SERVER}/books`;
 
     try {
-      let response = await axios.get(url);
-      this.setState({
-        books: response.data
-      })
-      console.log(response.data);
+      if (this.props.auth0.isAuthenticated){
+        const response = await this.props.auth0.getIdTokenClaims();
+        const jwt = response.__raw;
+        const config = {
+          headers: {"Authorization": `bearer ${jwt}`}, 
+          method: 'get', 
+          url: url
+        }
+        const bookData = await axios(config)
+        this.setState({
+          books: bookData.data
+        })
+      }
     }
     catch (error) {
       console.log(error);
@@ -41,13 +50,20 @@ class BestBooks extends React.Component {
   }
 
   postBook = async (newBook) => {
+    let url = `${process.env.REACT_APP_SERVER}/books`;
+    
     try {
-      let url = `${process.env.REACT_APP_SERVER}/books`;
-      const response = await axios.post(url, newBook);
-      // console.log(response.data);
-      this.setState({
-        books: [...this.state.books, response.data]
-      })
+      if (this.props.auth0.isAuthenticated){
+        const response = await this.props.auth0.getIdTokenClaims();
+        const jwt = response.__raw;
+        const config = {
+          headers: {"Authorization": `bearer ${jwt}`}, 
+        }
+        const bookData = await axios.post(url, newBook, config)
+        this.setState({
+            books: [...this.state.books, bookData.data]
+        })
+      }
     }
     catch (error) {
       console.error(error)
@@ -55,29 +71,44 @@ class BestBooks extends React.Component {
   }
 
   deleteBook = async (_id) => {
-  try{
     let url = `${process.env.REACT_APP_SERVER}/books/${_id}`;
-    await axios.delete(url);
+
+  try{
+  if (this.props.auth0.isAuthenticated){
+    const response = await this.props.auth0.getIdTokenClaims();
+    const jwt = response.__raw;
+    const config = {
+      headers: {"Authorization": `bearer ${jwt}`}, 
+    }
+    await axios.delete(url, config)
     let updatedBooks = this.state.books.filter(book => book._id !== _id);
     this.setState({
       books: updatedBooks
     })
   }
+}
   catch (error) {
     console.error(error)
   }
   }
 
   putBook = async (updatedBooks) => {
+    let url = `${process.env.REACT_APP_SERVER}/books/${updatedBooks._id}`;
+
     try{
-      console.log(updatedBooks);
-      let url = `${process.env.REACT_APP_SERVER}/books/${updatedBooks._id}`;
-      await axios.put(url, updatedBooks);
+    if (this.props.auth0.isAuthenticated){
+      const response = await this.props.auth0.getIdTokenClaims();
+      const jwt = response.__raw;
+      const config = {
+        headers: {"Authorization": `bearer ${jwt}`}, 
+      }
+      await axios.put(url, updatedBooks, config)
       const updatedBooksArr = this.state.books.map(oldBook => updatedBooks._id === oldBook._id ? updatedBooks : oldBook);
       this.setState({
         books: updatedBooksArr
       })
     }
+  }
     catch (error) {
       console.error(error);
     }
@@ -171,4 +202,4 @@ class BestBooks extends React.Component {
   }
 }
 
-export default BestBooks;
+export default withAuth0(BestBooks);
