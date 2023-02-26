@@ -7,9 +7,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   BrowserRouter as Router,
   Routes,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
+import { withAuth0 } from '@auth0/auth0-react';
+import Welcome from './Welcome';
 
 
 class App extends React.Component {
@@ -18,17 +19,13 @@ class App extends React.Component {
       <>
         <Router>
           <Header />
-          <nav>
-           <Link to="/">Home</Link>
-           <Link to="/about">About</Link>
-          </nav>
           <Routes>
             <Route 
               exact path="/"
-              element={<BestBooks />}
+              element={this.props.auth0.isAuthenticated ? <BestBooks /> : <Welcome />}
             />
-             <Route 
-              path="/about"
+            <Route 
+              path="/profile"
               element={<Profile />}
             />
 
@@ -40,4 +37,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default withAuth0(App);
